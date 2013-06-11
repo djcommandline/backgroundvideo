@@ -63,7 +63,7 @@ $.fn.backVids = function(options) {
         ogWidth       = 0,
         ogHeight      = 0,
         newHeight     = 0,
-        newWidth      = 0
+        newWidth      = 0;
 
 
     // check if we need to use the image fallback;
@@ -225,7 +225,7 @@ $.fn.backVids.getResizeDimensions = function( ogWidth, ogHeight, cWidth, cHeight
 
 
   return newDimensions;
-}
+};
 
 // get the overlay wrapper
 $.fn.backVids.buildVidWrapper = function(settings) {
@@ -234,7 +234,7 @@ $.fn.backVids.buildVidWrapper = function(settings) {
   .css({
     'position' : 'relative',
     'top' : '0',
-    'left' : '0',
+    'left' : '0'
   });
   return $wrap;
 };
@@ -292,13 +292,10 @@ $.fn.backVids.supportType = function(str) {
   switch (str) {
     case 'webm' :
       return (v.canPlayType('video/webm; codecs="vp8, vorbis"'));
-      break;
     case 'mp4' :
       return (v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"'));
-      break;
     case 'ogv' :
-      return (v.canPlayType('video/ogg; codecs="theora, vorbis"'));
-      break;      
+      return (v.canPlayType('video/ogg; codecs="theora, vorbis"'));   
   }
   // nope
   return false; 
