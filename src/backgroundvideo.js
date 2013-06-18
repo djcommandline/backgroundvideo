@@ -23,12 +23,9 @@
 /**
  * BackVids
  *
- * @author    : BaoQuoc Doan
- * @date      : Jun 10, 2013 
- * @url       : http://mantone.github.com/backvideos
- * @liscence  :
- *
- * @basedOn   : 
+ * @author : BaoQuoc Doan
+ * @date   : Jun 10, 2013 
+ * @url    : http://mantone.github.com/backvideos
  *
  */
 ;(function($) {
@@ -39,18 +36,20 @@ $.fn.backVids = function(options) {
   if (!$containers.length)
     return;
 
-  var useImageFallback = false;
-
-  // check if browser supports video
-  if($.fn.backVids.supportsVideo()) {
-    useImageFallback = false;
-  } else {
-    useImageFallback = true;
-  }
-
   // grab the user settings
   var settings = {};
   settings = $.extend({}, $.fn.backVids.defaults, options );
+
+  // check if browser supports video
+  if($.fn.backVids.supportsVideo()) {
+    settings.useImageFallback = false;
+  } else {
+    settings.useImageFallback = true;
+  }
+
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
+    settings.useImageFallback = true;
+  }
 
   // plugin magic happens here 
   return $containers.each(function() {
@@ -135,10 +134,6 @@ $.fn.backVids = function(options) {
             $newCSS = $.fn.backVids.getResizeDimensions( ogWidth, ogHeight, newWidth, newHeight );
             $video.css($newCSS);
 
-            console.log('w' + newWidth);
-            console.log('h' + newHeight);
-
-            console.log('resizing');
           });
       });
           
@@ -149,7 +144,7 @@ $.fn.backVids = function(options) {
         $video.bind('ended', function(){
 
         if (remainingLoops)
-          $video[0].replay();
+          $video[0].play();
 
         if (remainingLoops !== true)
           remainingLoops--;
@@ -170,6 +165,7 @@ $.fn.backVids.defaults = {
   setResponsive    : false,
   setParrallax     : false,
   parrallaxRate    : '1.2',
+  useFullScreen    : false,
   useImageFallback : false,
   wrapClass        : 'backvid',
   frontWrapClass   : 'overlay',
@@ -177,11 +173,13 @@ $.fn.backVids.defaults = {
   ogv              : '',
   webm             : '',
   poster           : '',
+  mobilePoster     : '',
   autoplay         : true,
   replayloop       : true,
   scale            : false,
   position         : "relative",
   opacity          : 1,
+  textReplacement  : false,
   zIndex           : 0,
   width            : 0,
   height           : 0
@@ -223,7 +221,6 @@ $.fn.backVids.getResizeDimensions = function( ogWidth, ogHeight, cWidth, cHeight
 
   }
 
-
   return newDimensions;
 };
 
@@ -263,15 +260,12 @@ $.fn.backVids.checkVideoType = function( srcEle, vidEle) {
 
     // check for support and set video src
     if ($.fn.backVids.supportType('mp4')){
-      console.log('mp4');
       return vidEle.attr('src',$mp4);
     }
     else if ($.fn.backVids.supportType('webm')) {     
-      console.log('webm');
       return vidEle.attr('src',$webm);       
     }
     else {          
-      console.log('ogv');
       return vidEle.attr('src',$ogv);
     }
 
@@ -295,7 +289,8 @@ $.fn.backVids.supportType = function(str) {
     case 'mp4' :
       return (v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"'));
     case 'ogv' :
-      return (v.canPlayType('video/ogg; codecs="theora, vorbis"'));   
+      return (v.canPlayType('video/ogg; codecs="theora, vorbis"'));
+    
   }
   // nope
   return false; 
@@ -337,7 +332,13 @@ $.fn.backVids.applyImageFallback = function (ele) {
   if(css3coverSupport === false)
     return false;
 
-  var fallbackSrc = ele.data('fallback-src');
+  var fallbackSrc = ele.data('poster');
+  var mobileFallbackSrc = ele.data('mobileposter');
+
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) && mobileFallbackSrc !== undefined ) {
+    fallbackSrc = mobileFallbackSrc;
+  }
+
   ele.css({
     'background' : 'url('+fallbackSrc+') no-repeat center center',
     '-webkit-background-size' : 'cover',
@@ -349,5 +350,6 @@ $.fn.backVids.applyImageFallback = function (ele) {
 
   return false;
 };
+
 
 }(jQuery));
